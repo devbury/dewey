@@ -37,6 +37,8 @@ public class HipChatServer implements ChatServer {
 
     public static final long ROOM_REFRESH_INTERVAL = 1000 * 60 * 2;
 
+    private static final String GROUP_SERVICE_NAME = "conf.hipchat.com";
+
     private static final Logger logger = LoggerFactory.getLogger(HipChatServer.class);
 
     @Autowired
@@ -70,7 +72,7 @@ public class HipChatServer implements ChatServer {
             xmppConnection.addPacketListener(filteredPacketListener, filteredPacketListener.getPacketTypeFilter());
         }
         if (AllPacketListener.logger.isTraceEnabled()) {
-            // register a debug listener
+            // register a trace listener
             AllPacketListener.logger.trace("registering debug AllPacketListener");
             AllPacketListener allPacketListener = new AllPacketListener();
             xmppConnection.addPacketListener(allPacketListener, allPacketListener.getPacketTypeFilter());
@@ -86,7 +88,7 @@ public class HipChatServer implements ChatServer {
     @Scheduled(fixedDelay = HipChatServer.ROOM_REFRESH_INTERVAL)
     protected void joinRooms() throws Exception {
         logger.debug("looking for rooms to join");
-        for (HostedRoom hostedRoom : MultiUserChat.getHostedRooms(xmppConnection, "conf.hipchat.com")) {
+        for (HostedRoom hostedRoom : MultiUserChat.getHostedRooms(xmppConnection, GROUP_SERVICE_NAME)) {
             if (!joinedRooms.containsKey(hostedRoom.getJid())) {
                 MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
                 if (!room.isJoined()) {
@@ -99,20 +101,21 @@ public class HipChatServer implements ChatServer {
     }
 
     @Override
-    public void sendMessageToRoom(String roomJid, String message) {
-        try {
-            joinedRooms.get(roomJid).sendMessage(message);
-        } catch (Exception e) {
-            logger.warn("Could not send message to room {}, {}", roomJid, e.getMessage());
-        }
-    }
-
-    @Override
-    public void sendMessageToUser(String userJid, String message) {
-        try {
-            xmppConnection.getChatManager().createChat(userJid, null).sendMessage(message);
-        } catch (Exception e) {
-            logger.warn("Could not send message to user {}, {}", userJid, e.getMessage());
+    public void sendMessage(String jid, String message) {
+        if (jid.contains(GROUP_SERVICE_NAME)) {
+            logger.debug("sending message to room");
+            try {
+                joinedRooms.get(jid.replaceAll("/.*$", "")).sendMessage(message);
+            } catch (Exception e) {
+                logger.warn("Could not send message to room {}, {}", jid, e);
+            }
+        } else {
+            logger.debug("sending message to user");
+            try {
+                xmppConnection.getChatManager().createChat(jid, null).sendMessage(message);
+            } catch (Exception e) {
+                logger.warn("Could not send message to user {}, {}", jid, e);
+            }
         }
     }
 }

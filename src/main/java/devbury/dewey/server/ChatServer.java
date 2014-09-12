@@ -17,6 +17,5 @@
 package devbury.dewey.server;
 
 public interface ChatServer {
-    void sendMessageToRoom(String roomJid, String message);
-    void sendMessageToUser(String userJid, String message);
+    void sendMessage(String jid, String message);
 }

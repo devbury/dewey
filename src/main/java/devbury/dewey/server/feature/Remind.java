@@ -20,6 +20,7 @@ package devbury.dewey.server.feature;
 import devbury.dewey.event.MessageEvent;
 import devbury.dewey.event.MessageEventListener;
 import devbury.dewey.model.Message;
+import devbury.dewey.model.MessageType;
 import devbury.dewey.server.ChatServer;
 import devbury.dewey.server.Plugin;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class Remind implements MessageEventListener {
     private static final Logger logger = LoggerFactory.getLogger(Remind.class);
 
     private Pattern pattern = Pattern.compile(
-            "^remind +me +in +(\\d+) +(second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months) +to +(.*)$");
+            "^remind +(me|us) +in +(\\d+) +(second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months) +to +(.*)$");
 
     @Autowired
     private ChatServer chatServer;
@@ -53,45 +54,66 @@ public class Remind implements MessageEventListener {
         if (message.isCommand()) {
             Matcher matcher = pattern.matcher(message.getCommand());
             if (matcher.matches()) {
-                final long timeUnits = Long.parseLong(matcher.group(1));
-                ChronoUnit units = ChronoUnit.SECONDS;
-                switch (matcher.group(2)) {
-                    case "weeks":
-                    case "week":
-                        units = ChronoUnit.WEEKS;
-                        break;
-                    case "months":
-                    case "month":
-                        units = ChronoUnit.MONTHS;
-                        break;
-                    case "days":
-                    case "day":
-                        units = ChronoUnit.DAYS;
-                        break;
-                    case "hours":
-                    case "hour":
-                        units = ChronoUnit.HOURS;
-                        break;
-                    case "minutes":
-                    case "minute":
-                        units = ChronoUnit.MINUTES;
-                        break;
+                String notify = matcher.group(1);
+                long timeAmount = Long.parseLong(matcher.group(2));
+                String timeUnits = matcher.group(3);
+                String reminderMessage = matcher.group(4);
+
+                boolean groupResponse = false;
+
+                if (message.getMessageType() == MessageType.GROUPCHAT && notify.equals("us")) {
+                    notify = "@All I was asked to remind everyone to '" + reminderMessage + "'";
+                    groupResponse = true;
+                } else {
+                    notify = "You asked me to remind you to " + matcher.group(4).replaceAll(" my ",
+                            " your ").replaceAll(" me ", " you ").replaceAll(" [Ii] ", " you ");
                 }
-                final String body = "You asked me to remind you to " + matcher.group(3).replaceAll(" my ",
-                        " your ").replaceAll(" me ", " you ").replaceAll(" [Ii] ", " you ");
-                final String from = message.getFrom();
-                Date date = Date.from(Instant.now().plus(timeUnits, units));
+
+                String from = message.getFrom();
+                String body = notify;
+
                 taskScheduler.schedule(new Runnable() {
                     @Override
                     public void run() {
-                        chatServer.sendMessageToUser(from, body);
+                        chatServer.sendMessage(from, body);
                     }
-                }, date);
-                chatServer.sendMessageToUser(from, "Don't worry,  I'll remind you");
+                }, notifyAt(timeAmount, timeUnits));
+                if (groupResponse) {
+                    chatServer.sendMessage(from, "Sure,  I'll remind everyone");
+                } else {
+                    chatServer.sendMessage(from, "Sure,  I'll remind you");
+                }
                 logger.debug("processedMessage");
                 return;
             }
         }
         logger.debug("did not process message {}", message.getBody());
+    }
+
+    private Date notifyAt(long amount, String units) {
+        ChronoUnit chronoUnit = ChronoUnit.SECONDS;
+        switch (units) {
+            case "weeks":
+            case "week":
+                chronoUnit = ChronoUnit.WEEKS;
+                break;
+            case "months":
+            case "month":
+                chronoUnit = ChronoUnit.MONTHS;
+                break;
+            case "days":
+            case "day":
+                chronoUnit = ChronoUnit.DAYS;
+                break;
+            case "hours":
+            case "hour":
+                chronoUnit = ChronoUnit.HOURS;
+                break;
+            case "minutes":
+            case "minute":
+                chronoUnit = ChronoUnit.MINUTES;
+                break;
+        }
+        return Date.from(Instant.now().plus(amount, chronoUnit));
     }
 }
