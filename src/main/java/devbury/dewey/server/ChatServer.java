@@ -18,4 +18,5 @@ package devbury.dewey.server;
 
 public interface ChatServer {
     void sendMessage(String jid, String message);
+    String findMentionName(String to);
 }

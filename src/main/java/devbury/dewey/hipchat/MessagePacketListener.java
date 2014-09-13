@@ -43,7 +43,7 @@ public class MessagePacketListener implements FilteredPacketListener<Message> {
 
     @Override
     public void handlePacket(Message packet) {
-        if (packet.getFrom().endsWith("/" + hipChatSettings.getNickname())) {
+        if (packet.getFrom().endsWith("/" + hipChatSettings.getName())) {
             logger.debug("not processing my own message");
             return;
         }

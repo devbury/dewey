@@ -26,18 +26,33 @@ import javax.validation.constraints.NotNull;
 public class HipChatSettings {
 
     @NotNull
-    private String userId;
-
-    @NotNull
-    private String nickname;
+    private String email;
 
     @NotNull
     private String password;
 
-    private String mentionName = "@Dewey";
+    @NotNull
+    private String apiToken;
+
+    private String xmppJid;
+    private String name;
+    private String mentionName;
     private String resource = "DeweyServer";
     private String server = "chat.hipchat.com";
     private int port = 5222;
+
+    @Override
+    public String toString() {
+        return "HipChatSettings{" +
+                "email='" + email + '\'' +
+                ", xmppJid='" + xmppJid + '\'' +
+                ", name='" + name + '\'' +
+                ", mentionName='" + mentionName + '\'' +
+                ", resource='" + resource + '\'' +
+                ", server='" + server + '\'' +
+                ", port=" + port +
+                '}';
+    }
 
     public String getMentionName() {
         return mentionName;
@@ -47,20 +62,12 @@ public class HipChatSettings {
         this.mentionName = mentionName.contains("@") ? mentionName : "@" + mentionName;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public String getResource() {
         return resource;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public void setPassword(String password) {
@@ -87,11 +94,35 @@ public class HipChatSettings {
         this.port = port;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getApiToken() {
+        return apiToken;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getXmppJid() {
+        return xmppJid;
+    }
+
+    public void setXmppJid(String xmppJid) {
+        this.xmppJid = xmppJid;
     }
 }

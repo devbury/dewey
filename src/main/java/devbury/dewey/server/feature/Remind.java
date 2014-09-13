@@ -59,17 +59,20 @@ public class Remind implements MessageEventListener {
                 String timeUnits = matcher.group(3);
                 String reminderMessage = matcher.group(4);
 
-                boolean groupResponse = false;
+                String from = message.getFrom();
 
+                String mention = message.getMessageType() == MessageType.GROUPCHAT ? chatServer.findMentionName(from)
+                        + " " : "";
+
+                boolean groupNotify = false;
                 if (message.getMessageType() == MessageType.GROUPCHAT && notify.equals("us")) {
                     notify = "@All I was asked to remind everyone to '" + reminderMessage + "'";
-                    groupResponse = true;
+                    groupNotify = true;
                 } else {
-                    notify = "You asked me to remind you to " + matcher.group(4).replaceAll(" my ",
+                    notify = mention + "You asked me to remind you to " + matcher.group(4).replaceAll(" my ",
                             " your ").replaceAll(" me ", " you ").replaceAll(" [Ii] ", " you ");
                 }
 
-                String from = message.getFrom();
                 String body = notify;
 
                 taskScheduler.schedule(new Runnable() {
@@ -78,10 +81,10 @@ public class Remind implements MessageEventListener {
                         chatServer.sendMessage(from, body);
                     }
                 }, notifyAt(timeAmount, timeUnits));
-                if (groupResponse) {
-                    chatServer.sendMessage(from, "Sure,  I'll remind everyone");
+                if (groupNotify) {
+                    chatServer.sendMessage(from, mention + "Sure,  I'll remind everyone");
                 } else {
-                    chatServer.sendMessage(from, "Sure,  I'll remind you");
+                    chatServer.sendMessage(from, mention + "Sure,  I'll remind you");
                 }
                 logger.debug("processedMessage");
                 return;

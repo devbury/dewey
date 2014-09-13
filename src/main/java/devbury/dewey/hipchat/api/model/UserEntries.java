@@ -14,13 +14,24 @@
  *    limitations under the License.
  */
 
-package devbury.dewey.server;
+package devbury.dewey.hipchat.api.model;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Configuration
-@ComponentScan("devbury.dewey.hipchat")
-//@Profile("hipchat")
-public class HipChatConfiguration {
+import java.util.ArrayList;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserEntries {
+
+    @JsonProperty("items")
+    private ArrayList<UserEntry> userEntries;
+
+    public ArrayList<UserEntry> getUserEntries() {
+        return userEntries;
+    }
+
+    public void setUserEntries(ArrayList<UserEntry> userEntries) {
+        this.userEntries = userEntries;
+    }
 }

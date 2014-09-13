@@ -16,6 +16,7 @@
 
 package devbury.dewey.hipchat;
 
+import devbury.dewey.hipchat.api.model.UserInfo;
 import devbury.dewey.server.ChatServer;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
@@ -31,6 +32,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class HipChatServer implements ChatServer {
@@ -45,22 +48,35 @@ public class HipChatServer implements ChatServer {
     private HipChatSettings hipChatSettings;
 
     @Autowired
+    private UserManager userManager;
+
+    @Autowired
     private List<FilteredPacketListener> filteredPacketListeners;
 
     private HashMap<String, MultiUserChat> joinedRooms = new HashMap<>();
 
     private XMPPConnection xmppConnection;
 
+    private Pattern userJidToIdPattern;
+
     @PostConstruct
     public void start() throws Exception {
-        logger.info("Connecting to HipChat");
+        UserInfo userInfo = userManager.findUserInfoByEmail(hipChatSettings.getEmail());
+        hipChatSettings.setMentionName(userInfo.getMentionName());
+        hipChatSettings.setName(userInfo.getName());
+        hipChatSettings.setXmppJid(userInfo.getXmppJid());
 
+        logger.debug("HipChat settings {}", hipChatSettings);
+
+        userJidToIdPattern = Pattern.compile("^(0-9)+_(0-9)+@.*$");
+
+        logger.info("Connecting to HipChat");
         ConnectionConfiguration config = new ConnectionConfiguration(hipChatSettings.getServer(),
                 hipChatSettings.getPort());
         xmppConnection = new XMPPConnection(config);
 
         xmppConnection.connect();
-        xmppConnection.login(hipChatSettings.getUserId(), hipChatSettings.getPassword(), hipChatSettings.getResource());
+        xmppConnection.login(hipChatSettings.getXmppJid(), hipChatSettings.getPassword(), hipChatSettings.getResource());
 
         joinRooms();
 
@@ -93,7 +109,7 @@ public class HipChatServer implements ChatServer {
                 MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
                 if (!room.isJoined()) {
                     logger.debug("joining room {} {}", hostedRoom.getName(), hostedRoom.getJid());
-                    room.join(hipChatSettings.getNickname());
+                    room.join(hipChatSettings.getName());
                 }
                 joinedRooms.put(hostedRoom.getJid(), room);
             }
@@ -117,5 +133,14 @@ public class HipChatServer implements ChatServer {
                 logger.warn("Could not send message to user {}, {}", jid, e);
             }
         }
+    }
+
+    @Override
+    public String findMentionName(String to) {
+        Matcher matcher = userJidToIdPattern.matcher(to);
+        if (matcher.matches()) {
+            return userManager.findUserEntryById(matcher.group(1)).getMentionName();
+        }
+        return "";
     }
 }
