@@ -17,7 +17,9 @@
 package devbury.dewey.hipchat;
 
 import devbury.dewey.event.MessageEvent;
-import devbury.dewey.model.MessageType;
+import devbury.dewey.hipchat.api.model.UserEntry;
+import devbury.dewey.model.Group;
+import devbury.dewey.model.User;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
@@ -26,8 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Component
-public class MessagePacketListener implements FilteredPacketListener<Message> {
+public class MessagePacketListener extends FilteredPacketListener<Message> {
     private static final Logger logger = LoggerFactory.getLogger(MessagePacketListener.class);
 
     @Autowired
@@ -36,6 +41,13 @@ public class MessagePacketListener implements FilteredPacketListener<Message> {
     @Autowired
     private HipChatSettings hipChatSettings;
 
+    @Autowired
+    private UserManager userManager;
+
+    private Pattern chatFrom = Pattern.compile("^.*_([0-9]*).*$");
+
+    private Pattern groupFrom = Pattern.compile("^.*_(.*)@.*/(.*)$");
+
     @Override
     public PacketTypeFilter getPacketTypeFilter() {
         return new PacketTypeFilter(Message.class);
@@ -43,37 +55,56 @@ public class MessagePacketListener implements FilteredPacketListener<Message> {
 
     @Override
     public void handlePacket(Message packet) {
-        if (packet.getFrom().endsWith("/" + hipChatSettings.getName())) {
+        if (packet.getFrom().endsWith(hipChatSettings.getName())) {
             logger.debug("not processing my own message");
             return;
         }
 
-        logger.debug("Packet is " + packet.toXML());
+        logger.debug("Packet is {}", packet.toXML());
 
         if (packet.getBody() == null) {
             logger.debug("not processing message with no body");
             return;
         }
 
-        devbury.dewey.model.Message message = new devbury.dewey.model.Message();
-
         switch (packet.getType()) {
             case chat:
-                message.setMessageType(MessageType.CHAT);
-                message.setToMe(true);
+                processChatPacket(packet);
                 break;
             case groupchat:
-                message.setMessageType(MessageType.GROUPCHAT);
-                message.setToMe(false);
+                processGroupChatPacket(packet);
                 break;
-            default:
-                // skip other types for now
-                return;
         }
-        message.setBody(packet.getBody());
-        message.setTo(packet.getTo());
-        message.setFrom(packet.getFrom());
-        message.setMentionName(hipChatSettings.getMentionName());
+    }
+
+    protected void processChatPacket(Message packet) {
+        Matcher fromMatcher = chatFrom.matcher(packet.getFrom());
+
+        if (!fromMatcher.matches()) {
+            logger.error("chat packet from does not match expected format {}", packet.getFrom());
+            return;
+        }
+
+        UserEntry userEntry = userManager.findUserEntryById(fromMatcher.group(1));
+        User fromUser = new User(userEntry.getName(), userEntry.getMentionName());
+        devbury.dewey.model.Message message = new devbury.dewey.model.Message(null, fromUser,
+                packet.getBody(), hipChatSettings.getMentionName());
+        eventPublisher.publishEvent(new MessageEvent(message));
+    }
+
+    protected void processGroupChatPacket(Message packet) {
+        Matcher fromMatcher = groupFrom.matcher(packet.getFrom());
+
+        if (!fromMatcher.matches()) {
+            logger.error("groupchat packet from does not match expected format {}", packet.getFrom());
+            return;
+        }
+
+        Group group = new Group(fromMatcher.group(1));
+        UserEntry userEntry = userManager.findUserEntryByName(fromMatcher.group(2));
+        User fromUser = new User(userEntry.getName(), userEntry.getMentionName());
+        devbury.dewey.model.Message message = new devbury.dewey.model.Message(group, fromUser,
+                packet.getBody(), hipChatSettings.getMentionName());
         eventPublisher.publishEvent(new MessageEvent(message));
     }
 }

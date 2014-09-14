@@ -16,6 +16,21 @@
 
 package devbury.dewey.model;
 
-public enum MessageType {
-    CHAT, GROUPCHAT;
+public abstract class Address {
+
+    private final String name;
+    private final AddressType addressType;
+
+    protected Address(String name, AddressType addressType) {
+        this.name = name;
+        this.addressType = addressType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public AddressType getAddressType() {
+        return addressType;
+    }
 }

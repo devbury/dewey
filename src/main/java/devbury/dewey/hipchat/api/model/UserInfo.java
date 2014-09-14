@@ -78,7 +78,7 @@ public class UserInfo {
     }
 
     public String getMentionName() {
-        return mentionName;
+        return mentionName.startsWith("@") ? mentionName : "@" + mentionName;
     }
 
     public void setMentionName(String mentionName) {

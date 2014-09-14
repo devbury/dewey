@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
-public class PresencePacketListener implements FilteredPacketListener<Presence> {
+public class PresencePacketListener extends FilteredPacketListener<Presence> {
 
     private static final Logger logger = LoggerFactory.getLogger(PresencePacketListener.class);
 

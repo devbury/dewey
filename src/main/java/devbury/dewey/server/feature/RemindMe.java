@@ -19,8 +19,9 @@ package devbury.dewey.server.feature;
 
 import devbury.dewey.event.MessageEvent;
 import devbury.dewey.event.MessageEventListener;
+import devbury.dewey.model.Address;
 import devbury.dewey.model.Message;
-import devbury.dewey.model.MessageType;
+import devbury.dewey.model.User;
 import devbury.dewey.server.ChatServer;
 import devbury.dewey.server.Plugin;
 import org.slf4j.Logger;
@@ -35,9 +36,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Plugin
-public class Remind implements MessageEventListener {
+public class RemindMe implements MessageEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(Remind.class);
+    private static final Logger logger = LoggerFactory.getLogger(RemindMe.class);
 
     private Pattern pattern = Pattern.compile(
             "^remind +(me|us) +in +(\\d+) +(second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months) +to +(.*)$");
@@ -59,17 +60,15 @@ public class Remind implements MessageEventListener {
                 String timeUnits = matcher.group(3);
                 String reminderMessage = matcher.group(4);
 
-                String from = message.getFrom();
+                User from = message.getFrom();
 
-                String mention = message.getMessageType() == MessageType.GROUPCHAT ? chatServer.findMentionName(from)
-                        + " " : "";
-
-                boolean groupNotify = false;
-                if (message.getMessageType() == MessageType.GROUPCHAT && notify.equals("us")) {
-                    notify = "@All I was asked to remind everyone to '" + reminderMessage + "'";
-                    groupNotify = true;
+                boolean groupNotify = message.isToGroup() && notify.equals("us");
+                String mention = message.isToGroup() ? message.getFrom().getMentionName() : "";
+                Address replyTo = message.isToGroup() ? message.getGroup() : from;
+                if (groupNotify) {
+                    notify = "@All, " + mention + " asked me to remind everyone to '" + reminderMessage + "'";
                 } else {
-                    notify = mention + "You asked me to remind you to " + matcher.group(4).replaceAll(" my ",
+                    notify = mention + " You asked me to remind you to " + matcher.group(4).replaceAll(" my ",
                             " your ").replaceAll(" me ", " you ").replaceAll(" [Ii] ", " you ");
                 }
 
@@ -78,18 +77,19 @@ public class Remind implements MessageEventListener {
                 taskScheduler.schedule(new Runnable() {
                     @Override
                     public void run() {
-                        chatServer.sendMessage(from, body);
+                        chatServer.sendMessage(replyTo, body);
                     }
                 }, notifyAt(timeAmount, timeUnits));
                 if (groupNotify) {
-                    chatServer.sendMessage(from, mention + "Sure,  I'll remind everyone");
+                    chatServer.sendMessage(replyTo, mention + " Sure,  I'll remind everyone");
                 } else {
-                    chatServer.sendMessage(from, mention + "Sure,  I'll remind you");
+                    chatServer.sendMessage(replyTo, mention + " Sure,  I'll remind you");
                 }
                 logger.debug("processedMessage");
                 return;
             }
         }
+
         logger.debug("did not process message {}", message.getBody());
     }
 

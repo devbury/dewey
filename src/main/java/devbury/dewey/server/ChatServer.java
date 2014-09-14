@@ -16,7 +16,8 @@
 
 package devbury.dewey.server;
 
+import devbury.dewey.model.Address;
+
 public interface ChatServer {
-    void sendMessage(String jid, String message);
-    String findMentionName(String to);
+    void sendMessage(Address address, String message);
 }

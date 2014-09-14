@@ -14,23 +14,9 @@
  *    limitations under the License.
  */
 
-package devbury.dewey.hipchat;
+package devbury.dewey.model;
 
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Packet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class AllPacketListener extends FilteredPacketListener<Packet> {
-    public static final Logger logger = LoggerFactory.getLogger(AllPacketListener.class);
-
-    @Override
-    public PacketTypeFilter getPacketTypeFilter() {
-        return new PacketTypeFilter(Packet.class);
-    }
-
-    @Override
-    public void handlePacket(Packet packet) {
-        logger.trace("received packet {}", packet.toXML());
-    }
+public enum AddressType {
+    USER, GROUP;
 }

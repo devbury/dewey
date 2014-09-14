@@ -20,13 +20,14 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-public interface FilteredPacketListener<E extends Packet> extends PacketListener {
-    PacketTypeFilter getPacketTypeFilter();
+public abstract class FilteredPacketListener<E extends Packet> implements PacketListener {
 
-    void handlePacket(E packet);
+    public abstract PacketTypeFilter getPacketTypeFilter();
+
+    public abstract void handlePacket(E packet);
 
     @SuppressWarnings("unchecked")
-    default void processPacket(Packet packet) {
+    public void processPacket(Packet packet) {
         handlePacket((E) packet);
     }
 }

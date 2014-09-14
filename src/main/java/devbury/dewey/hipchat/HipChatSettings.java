@@ -59,7 +59,7 @@ public class HipChatSettings {
     }
 
     public void setMentionName(String mentionName) {
-        this.mentionName = mentionName.contains("@") ? mentionName : "@" + mentionName;
+        this.mentionName = mentionName;
     }
 
     public String getPassword() {

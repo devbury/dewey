@@ -17,6 +17,10 @@
 package devbury.dewey.hipchat;
 
 import devbury.dewey.hipchat.api.model.UserInfo;
+import devbury.dewey.model.Address;
+import devbury.dewey.model.AddressType;
+import devbury.dewey.model.Group;
+import devbury.dewey.model.User;
 import devbury.dewey.server.ChatServer;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
@@ -32,8 +36,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class HipChatServer implements ChatServer {
@@ -57,8 +59,6 @@ public class HipChatServer implements ChatServer {
 
     private XMPPConnection xmppConnection;
 
-    private Pattern userJidToIdPattern;
-
     @PostConstruct
     public void start() throws Exception {
         UserInfo userInfo = userManager.findUserInfoByEmail(hipChatSettings.getEmail());
@@ -67,8 +67,6 @@ public class HipChatServer implements ChatServer {
         hipChatSettings.setXmppJid(userInfo.getXmppJid());
 
         logger.debug("HipChat settings {}", hipChatSettings);
-
-        userJidToIdPattern = Pattern.compile("^(0-9)+_(0-9)+@.*$");
 
         logger.info("Connecting to HipChat");
         ConnectionConfiguration config = new ConnectionConfiguration(hipChatSettings.getServer(),
@@ -84,7 +82,7 @@ public class HipChatServer implements ChatServer {
         // receiving chat history
 
         for (FilteredPacketListener filteredPacketListener : filteredPacketListeners) {
-            logger.debug("registering PacketListener {}", filteredPacketListener);
+            logger.info("registering PacketListener {}", filteredPacketListener);
             xmppConnection.addPacketListener(filteredPacketListener, filteredPacketListener.getPacketTypeFilter());
         }
         if (AllPacketListener.logger.isTraceEnabled()) {
@@ -105,42 +103,37 @@ public class HipChatServer implements ChatServer {
     protected void joinRooms() throws Exception {
         logger.debug("looking for rooms to join");
         for (HostedRoom hostedRoom : MultiUserChat.getHostedRooms(xmppConnection, GROUP_SERVICE_NAME)) {
-            if (!joinedRooms.containsKey(hostedRoom.getJid())) {
+            if (!joinedRooms.containsKey(hostedRoom.getName())) {
                 MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
                 if (!room.isJoined()) {
-                    logger.debug("joining room {} {}", hostedRoom.getName(), hostedRoom.getJid());
+                    logger.debug("joining room {}", hostedRoom.getName());
                     room.join(hipChatSettings.getName());
                 }
-                joinedRooms.put(hostedRoom.getJid(), room);
+                joinedRooms.put(hostedRoom.getName(), room);
             }
         }
     }
 
     @Override
-    public void sendMessage(String jid, String message) {
-        if (jid.contains(GROUP_SERVICE_NAME)) {
-            logger.debug("sending message to room");
+    public void sendMessage(Address address, String message) {
+        if (address.getAddressType() == AddressType.GROUP) {
+            Group group = (Group) address;
+            logger.debug("sending message to room {}", group.getName());
+            MultiUserChat room = joinedRooms.get(group.getName());
             try {
-                joinedRooms.get(jid.replaceAll("/.*$", "")).sendMessage(message);
+                room.sendMessage(message);
             } catch (Exception e) {
-                logger.warn("Could not send message to room {}, {}", jid, e);
+                logger.warn("Could not send message to room {}, {}", room.getNickname(), e);
             }
         } else {
-            logger.debug("sending message to user");
+            User user = (User) address;
+            logger.debug("sending message to user {}", user.getName());
+            String xmppJid = userManager.findXmppJidById(userManager.findUserEntryByName(user.getName()).getId());
             try {
-                xmppConnection.getChatManager().createChat(jid, null).sendMessage(message);
+                xmppConnection.getChatManager().createChat(xmppJid, null).sendMessage(message);
             } catch (Exception e) {
-                logger.warn("Could not send message to user {}, {}", jid, e);
+                logger.warn("Could not send message to user {}, {}", xmppJid, e);
             }
         }
-    }
-
-    @Override
-    public String findMentionName(String to) {
-        Matcher matcher = userJidToIdPattern.matcher(to);
-        if (matcher.matches()) {
-            return userManager.findUserEntryById(matcher.group(1)).getMentionName();
-        }
-        return "";
     }
 }

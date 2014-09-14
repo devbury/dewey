@@ -37,9 +37,10 @@ public class UserManager {
     @Autowired
     private Api api;
 
-    private HashMap<String, UserEntry> byId = new HashMap<>();
-    private HashMap<String, UserEntry> byName = new HashMap<>();
-    private HashMap<String, UserEntry> byMentionName = new HashMap<>();
+    private HashMap<String, UserEntry> userEntryById = new HashMap<>();
+    private HashMap<String, UserEntry> userEntryByName = new HashMap<>();
+    private HashMap<String, UserEntry> userEntryByMentionName = new HashMap<>();
+    private HashMap<String, String> xmppJidById = new HashMap<>();
 
     @Scheduled(fixedDelay = THIRTY_MINUTES)
     public void configureCaches() {
@@ -55,37 +56,57 @@ public class UserManager {
             buildByMentionName.put(userEntry.getMentionName(), userEntry);
         }
 
-        byId = buildById;
-        byName = buildByName;
-        byMentionName = buildByMentionName;
+        userEntryById = buildById;
+        userEntryByName = buildByName;
+        userEntryByMentionName = buildByMentionName;
         logger.debug("finished loading cache with {} users", userEntries.getUserEntries().size());
     }
 
-    UserEntry findUserEntryById(String id) {
-        return byId.get(id);
+    protected String findXmppJidById(String id) {
+        String xmppJid = xmppJidById.get(id);
+        if (xmppJid == null) {
+            UserInfo userInfo = findUserInfoById(id);
+            xmppJid = userInfo.getXmppJid();
+            addToXmppJidCache(id, xmppJid);
+        }
+        return xmppJid;
     }
 
-    UserEntry findUserEntryByName(String name) {
-        return byName.get(name);
+    protected synchronized void addToXmppJidCache(String id, String xmppJid) {
+        if (xmppJidById.get(id) == null) {
+            xmppJidById.put(id, xmppJid);
+        }
     }
 
-    UserEntry findUserEntryByMentionName(String mentionName) {
-        return byMentionName.get(mentionName);
+    public UserEntry findUserEntryById(String id) {
+        return userEntryById.get(id);
     }
 
-    UserInfo findUserInfoById(String id) {
-        return api.findById(id);
+    public UserEntry findUserEntryByName(String name) {
+        return userEntryByName.get(name);
     }
 
-    UserInfo findUserInfoByName(String name) {
-        return api.findById(findUserEntryByName(name).getId());
+    public UserEntry findUserEntryByMentionName(String mentionName) {
+        return userEntryByMentionName.get(mentionName);
     }
 
-    UserInfo findUserInfoByMentionName(String mentionName) {
-        return api.findById(findUserEntryByMentionName(mentionName).getId());
+    public UserInfo findUserInfoById(String id) {
+        UserInfo userInfo = api.findById(id);
+        if (xmppJidById.get(id) == null) {
+            addToXmppJidCache(id, userInfo.getXmppJid());
+        }
+        return userInfo;
     }
 
-    UserInfo findUserInfoByEmail(String email) {
-      return api.findByEmail(email);
+    public UserInfo findUserInfoByName(String name) {
+        return findUserInfoById(findUserEntryByName(name).getId());
+    }
+
+    public UserInfo findUserInfoByMentionName(String mentionName) {
+        return findUserInfoById(findUserEntryByMentionName(mentionName).getId());
+    }
+
+    public UserInfo findUserInfoByEmail(String email) {
+        return api.findByEmail(email);
     }
 }

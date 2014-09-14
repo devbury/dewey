@@ -17,70 +17,47 @@
 package devbury.dewey.model;
 
 public class Message {
-    private String to;
-    private String from;
-    private String body;
-    private MessageType messageType;
-    private String mentionName;
-    private boolean toMe;
+    private final Group group;
+    private final User from;
+    private final String body;
+    private final String robotMentionName;
+
+    public Message(Group group, User from, String body, String robotMentionName) {
+        this.group = group;
+        this.from = from;
+        this.body = body;
+        this.robotMentionName = robotMentionName;
+    }
 
     public boolean isDirectedToMe() {
-        return isToMe() || body.contains(mentionName);
+        return isToMe() || body.contains(robotMentionName);
     }
 
     public boolean isCommand() {
-        return isToMe() || body.startsWith(mentionName);
+        return isToMe() || body.startsWith(robotMentionName);
     }
 
     public String getCommand() {
-        return body.replaceFirst(mentionName, "").trim();
-    }
-
-    public String getMentionName() {
-        return mentionName;
-    }
-
-    public void setMentionName(String mentionName) {
-        this.mentionName = mentionName;
+        return body.replaceFirst(robotMentionName, "").trim();
     }
 
     public boolean isToMe() {
-        return toMe;
+        return group == null;
     }
 
-    public void setToMe(boolean toMe) {
-        this.toMe = toMe;
+    public boolean isToGroup() {
+        return !isToMe();
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public User getFrom() {
+        return from;
     }
 
     public String getBody() {
         return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(MessageType messageType) {
-        this.messageType = messageType;
     }
 }

@@ -21,7 +21,7 @@ import devbury.dewey.model.Message;
 
 public class MessageEvent extends Event {
 
-    private Message message;
+    private final Message message;
 
     public MessageEvent(Message message) {
         super(message);
