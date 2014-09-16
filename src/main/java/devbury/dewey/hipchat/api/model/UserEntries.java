@@ -19,19 +19,19 @@ package devbury.dewey.hipchat.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserEntries {
 
     @JsonProperty("items")
-    private ArrayList<UserEntry> userEntries;
+    private List<UserEntry> userEntries;
 
-    public ArrayList<UserEntry> getUserEntries() {
+    public List<UserEntry> getUserEntries() {
         return userEntries;
     }
 
-    public void setUserEntries(ArrayList<UserEntry> userEntries) {
+    public void setUserEntries(List<UserEntry> userEntries) {
         this.userEntries = userEntries;
     }
 }
