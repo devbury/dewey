@@ -16,14 +16,13 @@
 
 package devbury.dewey.hipchat;
 
+import com.google.common.annotations.VisibleForTesting;
 import devbury.dewey.event.MessageEvent;
 import devbury.dewey.hipchat.api.model.UserEntry;
 import devbury.dewey.model.Group;
 import devbury.dewey.model.User;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -33,13 +32,9 @@ import java.util.regex.Pattern;
 
 @Component
 public class MessagePacketListener extends FilteredPacketListener<Message> {
-    private static final Logger logger = LoggerFactory.getLogger(MessagePacketListener.class);
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    private HipChatSettings hipChatSettings;
 
     @Autowired
     private UserManager userManager;
@@ -55,11 +50,6 @@ public class MessagePacketListener extends FilteredPacketListener<Message> {
 
     @Override
     public void handlePacket(Message packet) {
-        if (packet.getFrom().endsWith(hipChatSettings.getName())) {
-            logger.debug("not processing my own message");
-            return;
-        }
-
         logger.debug("Packet is {}", packet.toXML());
 
         if (packet.getBody() == null) {
@@ -106,5 +96,15 @@ public class MessagePacketListener extends FilteredPacketListener<Message> {
         devbury.dewey.model.Message message = new devbury.dewey.model.Message(group, fromUser,
                 packet.getBody(), hipChatSettings.getMentionName());
         eventPublisher.publishEvent(new MessageEvent(message));
+    }
+
+    @VisibleForTesting
+    void setEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
+
+    @VisibleForTesting
+    void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
     }
 }

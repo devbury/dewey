@@ -16,11 +16,20 @@
 
 package devbury.dewey.hipchat;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FilteredPacketListener<E extends Packet> implements PacketListener {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    protected HipChatSettings hipChatSettings;
 
     public abstract PacketTypeFilter getPacketTypeFilter();
 
@@ -28,6 +37,15 @@ public abstract class FilteredPacketListener<E extends Packet> implements Packet
 
     @SuppressWarnings("unchecked")
     public void processPacket(Packet packet) {
+        if (packet.getFrom().endsWith(hipChatSettings.getName())) {
+            logger.debug("My Packet, skipping");
+            return;
+        }
         handlePacket((E) packet);
+    }
+
+    @VisibleForTesting
+    void setHipChatSettings(HipChatSettings hipChatSettings) {
+        this.hipChatSettings = hipChatSettings;
     }
 }
