@@ -16,6 +16,7 @@
 
 package devbury.dewey.hipchat.api;
 
+import com.google.common.annotations.VisibleForTesting;
 import devbury.dewey.hipchat.HipChatSettings;
 import devbury.dewey.hipchat.api.model.UserEntries;
 import devbury.dewey.hipchat.api.model.UserInfo;
@@ -72,5 +73,10 @@ public class Api implements ClientHttpRequestInterceptor {
         HttpHeaders headers = request.getHeaders();
         headers.add("Authorization", authorization);
         return execution.execute(request, body);
+    }
+
+    @VisibleForTesting
+    void setHipChatSettings(HipChatSettings hipChatSettings) {
+        this.hipChatSettings = hipChatSettings;
     }
 }
