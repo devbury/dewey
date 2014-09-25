@@ -16,6 +16,7 @@
 
 package devbury.dewey.hipchat;
 
+import com.google.common.annotations.VisibleForTesting;
 import devbury.dewey.hipchat.api.model.UserInfo;
 import devbury.dewey.model.Address;
 import devbury.dewey.model.AddressType;
@@ -36,6 +37,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class HipChatServer implements ChatServer {
@@ -55,7 +57,7 @@ public class HipChatServer implements ChatServer {
     @Autowired
     private List<FilteredPacketListener> filteredPacketListeners;
 
-    private HashMap<String, MultiUserChat> joinedRooms = new HashMap<>();
+    private Map<String, MultiUserChat> joinedRooms = new HashMap<>();
 
     private XMPPConnection xmppConnection;
 
@@ -71,6 +73,7 @@ public class HipChatServer implements ChatServer {
         logger.info("Connecting to HipChat");
         ConnectionConfiguration config = new ConnectionConfiguration(hipChatSettings.getServer(),
                 hipChatSettings.getPort());
+
         xmppConnection = new XMPPConnection(config);
 
         xmppConnection.connect();
@@ -135,5 +138,20 @@ public class HipChatServer implements ChatServer {
                 logger.warn("Could not send message to user {}, {}", xmppJid, e);
             }
         }
+    }
+
+    @VisibleForTesting
+    void setXmppConnection(XMPPConnection xmppConnection) {
+        this.xmppConnection = xmppConnection;
+    }
+
+    @VisibleForTesting
+    void setJoinedRooms(Map<String, MultiUserChat> joinedRooms) {
+        this.joinedRooms = joinedRooms;
+    }
+
+    @VisibleForTesting
+    void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
     }
 }
