@@ -17,6 +17,7 @@
 package devbury.dewey.server.feature;
 
 
+import com.google.common.annotations.VisibleForTesting;
 import devbury.dewey.event.MessageEvent;
 import devbury.dewey.event.MessageEventListener;
 import devbury.dewey.model.Address;
@@ -74,16 +75,12 @@ public class RemindMe implements MessageEventListener {
 
                 String body = notify;
 
-                taskScheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        chatServer.sendMessage(replyTo, body);
-                    }
-                }, notifyAt(timeAmount, timeUnits));
+                scheduleMessage(replyTo, body, notifyAt(timeAmount, timeUnits));
+
                 if (groupNotify) {
-                    chatServer.sendMessage(replyTo, mention + " Sure,  I'll remind everyone");
+                    chatServer.sendMessage(replyTo, mention + " Sure, I'll remind everyone");
                 } else {
-                    chatServer.sendMessage(replyTo, mention + " Sure,  I'll remind you");
+                    chatServer.sendMessage(replyTo, mention + " Sure, I'll remind you");
                 }
                 logger.debug("processedMessage");
                 return;
@@ -91,6 +88,15 @@ public class RemindMe implements MessageEventListener {
         }
 
         logger.debug("did not process message {}", message.getBody());
+    }
+
+    protected void scheduleMessage(Address replyTo, String message, Date notifyAt) {
+        taskScheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                chatServer.sendMessage(replyTo, message);
+            }
+        }, notifyAt);
     }
 
     private Date notifyAt(long amount, String units) {
@@ -118,5 +124,10 @@ public class RemindMe implements MessageEventListener {
                 break;
         }
         return Date.from(Instant.now().plus(amount, chronoUnit));
+    }
+
+    @VisibleForTesting
+    void setChatServer(ChatServer chatServer) {
+        this.chatServer = chatServer;
     }
 }
