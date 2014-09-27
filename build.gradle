@@ -29,6 +29,9 @@ repositories {
     mavenCentral()
 }
 
+
+version = '1.0.0-SNAPSHOT'
+
 dependencies {
     versionManagement 'io.spring.platform:platform-versions:1.0.2.RELEASE@properties'
     compile 'org.springframework.boot:spring-boot-starter-web'
@@ -43,3 +46,15 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 
 }
+
+task banner(type: Copy) {
+    from 'base_banner.txt'
+    into 'src/main/resources'
+    rename 'base_banner.txt', 'banner.txt'
+    expand project: project.name, version: version
+}
+
+jar {
+    dependsOn banner
+}
+
