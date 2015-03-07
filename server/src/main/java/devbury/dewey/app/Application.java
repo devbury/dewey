@@ -14,7 +14,15 @@
  *    limitations under the License.
  */
 
-rootProject.name = 'dewey'
-include 'spring-boot-starter-dewey-core'
-include 'spring-boot-starter-dewey-hipchat'
-include 'server'
+package devbury.dewey.app;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}

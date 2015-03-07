@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 devbury LLC
+ * Copyright 2015 devbury LLC
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,26 @@
  *    limitations under the License.
  */
 
-rootProject.name = 'dewey'
-include 'spring-boot-starter-dewey-core'
-include 'spring-boot-starter-dewey-hipchat'
-include 'server'
+package devbury.dewey.core.model;
+
+public class Status {
+    private boolean available;
+    private String message;
+
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
