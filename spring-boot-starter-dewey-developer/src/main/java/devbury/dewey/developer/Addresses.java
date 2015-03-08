@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-dependencies {
-    compile project(':spring-boot-starter-dewey-core')
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
+package devbury.dewey.developer;
+
+import devbury.dewey.core.model.Group;
+import devbury.dewey.core.model.User;
+
+public class Addresses {
+    public static final User DEWEY = new User("dewey", "@dewey");
+    public static final User DEVELOPER = new User("developer", "@developer");
+    public static final Group DEFAULT_GROUP = new Group("default");
 }

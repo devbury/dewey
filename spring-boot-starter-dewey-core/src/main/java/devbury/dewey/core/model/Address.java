@@ -33,4 +33,12 @@ public abstract class Address {
     public AddressType getAddressType() {
         return addressType;
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "name='" + name + '\'' +
+                ", addressType=" + addressType +
+                '}';
+    }
 }

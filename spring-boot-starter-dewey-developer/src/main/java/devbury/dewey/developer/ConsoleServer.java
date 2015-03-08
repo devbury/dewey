@@ -18,11 +18,15 @@ package devbury.dewey.developer;
 
 import devbury.dewey.core.event.MessageEvent;
 import devbury.dewey.core.model.Address;
+import devbury.dewey.core.model.AddressType;
+import devbury.dewey.core.model.Group;
 import devbury.dewey.core.model.Message;
-import devbury.dewey.core.model.User;
 import devbury.dewey.core.server.ChatServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+
+import static devbury.dewey.developer.Addresses.DEVELOPER;
+import static devbury.dewey.developer.Addresses.DEWEY;
 
 public class ConsoleServer implements ChatServer {
 
@@ -31,11 +35,14 @@ public class ConsoleServer implements ChatServer {
 
     @Override
     public void sendMessage(Address address, String message) {
-        if ("Dewey".equals(address.getName())) {
-            User from = new User("developer", "developer");
-            eventPublisher.publishEvent(new MessageEvent(new Message(null, from, message, "Dewey")));
-        } else {
-            System.out.println("[" + address.getAddressType() + " " + address.getName() + "] " + message);
+        System.out.println("[" + address.getAddressType() + " " + address.getName() + "] " + message);
+    }
+
+    public void sendMessageFromDeveloper(Address address, String message) {
+        Group group = null;
+        if (address.getAddressType() == AddressType.GROUP) {
+            group = (Group) address;
         }
+        eventPublisher.publishEvent(new MessageEvent(new Message(group, DEVELOPER, message, DEWEY.getMentionName())));
     }
 }

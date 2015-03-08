@@ -28,4 +28,11 @@ public class User extends Address {
     public String getMentionName() {
         return mentionName;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "mentionName='" + mentionName + '\'' +
+                "} " + super.toString();
+    }
 }

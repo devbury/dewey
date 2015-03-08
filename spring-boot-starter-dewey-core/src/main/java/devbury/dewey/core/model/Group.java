@@ -21,4 +21,9 @@ public class Group extends Address {
     public Group(String name) {
         super(name, AddressType.GROUP);
     }
+
+    @Override
+    public String toString() {
+        return "Group{} " + super.toString();
+    }
 }
