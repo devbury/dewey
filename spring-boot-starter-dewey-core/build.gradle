@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-bootRepackage.enabled = false
-
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework:spring-context-support'
-    compile 'org.springframework.boot:spring-boot-starter-test'
     compile 'devbury.threadscope:spring-boot-starter-threadscope:1.0.0'
     compile 'com.google.guava:guava:18.0'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

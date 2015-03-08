@@ -28,6 +28,13 @@ buildscript {
 subprojects {
     apply plugin: 'spring-boot'
 
+    bootRepackage {
+        enabled = false
+        mainClassName = ""
+    }
+
+    bootRun.enabled = false
+
     repositories {
         jcenter()
     }

@@ -17,4 +17,6 @@
 rootProject.name = 'dewey'
 include 'spring-boot-starter-dewey-core'
 include 'spring-boot-starter-dewey-hipchat'
+include 'spring-boot-starter-dewey-core-plugins'
+include 'spring-boot-starter-dewey-developer'
 include 'server'

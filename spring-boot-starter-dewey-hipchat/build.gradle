@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-bootRepackage.enabled = false
-
 dependencies {
-    compile project(':spring-boot-starter-dewey-core')
+    compile project(':spring-boot-starter-dewey-core-plugins')
+    compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.igniterealtime.smack:smack:3.2.1'
     compile 'org.igniterealtime.smack:smackx:3.2.1'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 

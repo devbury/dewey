@@ -40,7 +40,7 @@ public class CoreConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(CoreConfiguration.class);
 
-    @Autowired
+    @Autowired(required = false)
     private List<MessageEventListener> messageEventListeners;
 
     @Bean
@@ -51,6 +51,11 @@ public class CoreConfiguration {
 
     @PostConstruct
     public void init() {
-        messageEventListeners.forEach(m -> logger.info("Installed plugin {}", m.getClass().getSimpleName()));
+        logger.info("Installing plugins:");
+        if (messageEventListeners != null) {
+            messageEventListeners.forEach(m -> logger.info("  Installed plugin {}", m.getClass().getSimpleName()));
+        } else {
+            logger.info("  NONE!");
+        }
     }
 }

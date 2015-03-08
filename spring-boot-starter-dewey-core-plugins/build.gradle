@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package devbury.dewey.hipchat;
-
-/**
- * Spring-boot gradle plugin is complaining about there being no main even though repackage enabled is set to false.
- * Remove this main when a solution is found.
- */
-public class Main {
-    public static void main(String... args) {
-
-    }
+dependencies {
+    compile project(':spring-boot-starter-dewey-core')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
+
+
+

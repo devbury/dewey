@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-bootRepackage {
-    enabled = true
-    mainClassName = "devbury.dewey.app.Application"
-}
-
-bootRun.enabled = true
-
 dependencies {
-    // Select the desired server
-
-    // Plugin developer server with core plugins installed
-    compile project(':spring-boot-starter-dewey-developer')
-    compile project(':spring-boot-starter-dewey-core-plugins')
-
-    // Hipchat server
-    //compile project(':spring-boot-starter-dewey-hipchat')
+    compile project(':spring-boot-starter-dewey-core')
+    compile 'org.springframework.boot:spring-boot-starter-test'
 }

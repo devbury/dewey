@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package devbury.dewey.core.server;
+package devbury.dewey.developer;
 
-/**
- * Spring-boot gradle plugin is complaining about there being no main even though repackage enabled is set to false.
- * Remove this main when a solution is found.
- */
-public class Main {
-    public static void main(String... args) {
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 
+public class Configuration {
+
+    @Bean
+    @ConditionalOnMissingBean(CommandLineRunner.class)
+    public CommandLineRunner runner() {
+        return new Runner();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ConsoleServer.class)
+    public ConsoleServer consoleServer() {
+        return new ConsoleServer();
     }
 }

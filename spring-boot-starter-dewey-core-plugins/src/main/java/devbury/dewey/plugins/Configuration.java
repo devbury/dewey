@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-bootRepackage {
-    enabled = true
-    mainClassName = "devbury.dewey.app.Application"
-}
+package devbury.dewey.plugins;
 
-bootRun.enabled = true
+import org.springframework.context.annotation.ComponentScan;
 
-dependencies {
-    // Select the desired server
-
-    // Plugin developer server with core plugins installed
-    compile project(':spring-boot-starter-dewey-developer')
-    compile project(':spring-boot-starter-dewey-core-plugins')
-
-    // Hipchat server
-    //compile project(':spring-boot-starter-dewey-hipchat')
+@ComponentScan
+public class Configuration {
 }
