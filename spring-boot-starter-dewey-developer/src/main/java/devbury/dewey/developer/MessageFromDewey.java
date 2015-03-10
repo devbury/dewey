@@ -16,22 +16,22 @@
 
 package devbury.dewey.developer;
 
-import devbury.dewey.core.server.ChatServer;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
+import devbury.dewey.core.model.Address;
 
-public class Configuration {
+public class MessageFromDewey {
+    private final Address address;
+    private final String body;
 
-    @Bean
-    @ConditionalOnMissingBean(CommandLineRunner.class)
-    public Runner runner() {
-        return new Runner();
+    public MessageFromDewey(Address address, String body) {
+        this.address = address;
+        this.body = body;
     }
 
-    @Bean
-    @ConditionalOnMissingBean(ChatServer.class)
-    public ConsoleServer consoleServer() {
-        return new ConsoleServer();
+    public Address address() {
+        return address;
+    }
+
+    public String body() {
+        return body;
     }
 }

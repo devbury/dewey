@@ -118,8 +118,5 @@ public class RemindMe implements MessageEventListener {
         }
         return Date.from(Instant.now().plus(amount, chronoUnit));
     }
-
-    void setChatServer(ChatServer chatServer) {
-        this.chatServer = chatServer;
-    }
 }
+

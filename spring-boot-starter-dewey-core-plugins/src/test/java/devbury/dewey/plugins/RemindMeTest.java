@@ -16,71 +16,87 @@
 
 package devbury.dewey.plugins;
 
-import devbury.dewey.core.event.MessageEvent;
-import devbury.dewey.core.model.Address;
-import devbury.dewey.core.model.Group;
-import devbury.dewey.core.model.Message;
-import devbury.dewey.core.model.User;
-import devbury.dewey.core.server.ChatServer;
-import mockit.Mocked;
-import mockit.Verifications;
-import mockit.integration.junit4.JMockit;
+import devbury.dewey.developer.PluginTest;
+import devbury.dewey.developer.PluginTester;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
-
+import static devbury.dewey.developer.Addresses.*;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(JMockit.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = RemindMeTest.class)
+@PluginTest
 public class RemindMeTest {
 
-    @Test
-    public void onEventFromUser(@Mocked ChatServer chatServer) {
-        User user = new User("fromUser", "@FromUser");
-        Message message = new Message(null, user, "remind me in 1 minute to send my message", "@Dewey");
+    @Autowired
+    PluginTester pluginTester;
 
-        MessageEvent event = new MessageEvent(message);
-        RemindMe remindMe = new RemindMe() {
-            @Override
-            protected void scheduleMessage(Address replyTo, String message, Date notifyAt) {
-                assertEquals(" You asked me to remind you to send your message", message);
-                assertEquals(user, replyTo);
-            }
-        };
-
-        remindMe.setChatServer(chatServer);
-        remindMe.onEvent(event);
-
-        new Verifications() {
-            {
-                chatServer.sendMessage(user, " Sure, I'll remind you");
-            }
-        };
+    @Before
+    public void init() {
+        pluginTester.clearMessages();
     }
 
     @Test
-    public void onEventFromGroup(@Mocked ChatServer chatServer) {
-        User user = new User("fromUser", "@FromUser");
-        Group group = new Group("group");
-        Message message = new Message(group, user, "@Dewey remind us in 2 hours to send my message", "@Dewey");
+    public void messageFromUser() throws Exception {
+        pluginTester.sendMessageToDewey("remind me in 1 second to send my message");
 
-        MessageEvent event = new MessageEvent(message);
-        RemindMe remindMe = new RemindMe() {
-            @Override
-            protected void scheduleMessage(Address replyTo, String message, Date notifyAt) {
-                assertEquals("@All, @FromUser asked me to remind everyone to 'send my message'", message);
-                assertEquals(group, replyTo);
-            }
-        };
+        sleep();
 
-        remindMe.setChatServer(chatServer);
-        remindMe.onEvent(event);
+        assertEquals(2, pluginTester.messages().size());
 
-        new Verifications() {
-            {
-                chatServer.sendMessage(group, "@FromUser Sure, I'll remind everyone");
-            }
-        };
+        assertEquals(DEVELOPER, pluginTester.message(0).address());
+        assertEquals(" Sure, I'll remind you", pluginTester.message(0).body());
+
+        assertEquals(DEVELOPER, pluginTester.message(1).address());
+        assertEquals(" You asked me to remind you to send your message", pluginTester.message(1).body());
+    }
+
+    @Test
+    public void messageFromUserInGroupChatMentioningDewey() throws Exception {
+        pluginTester.sendMessageToGroup(DEWEY + " remind us in 1 second to send my message");
+
+        sleep();
+
+        assertEquals(2, pluginTester.messages().size());
+
+        assertEquals(DEFAULT_GROUP, pluginTester.message(0).address());
+        assertEquals(DEVELOPER + " Sure, I'll remind everyone", pluginTester.message(0).body());
+
+        assertEquals(DEFAULT_GROUP, pluginTester.message(1).address());
+        assertEquals("@All, " + DEVELOPER + " asked me to remind everyone to 'send my message'",
+                pluginTester.message(1).body());
+    }
+
+    @Test
+    public void messageFromUserInGroupChatNotMentioningDewey() throws Exception {
+        pluginTester.sendMessageToGroup("remind us in 1 second to send my message");
+
+        sleep();
+
+        assertEquals(0, pluginTester.messages().size());
+    }
+
+    @Test
+    public void messageFromUserInGroupChat() throws Exception {
+        pluginTester.sendMessageToGroup(DEWEY + " remind me in 1 second to send my message");
+
+        sleep();
+
+        assertEquals(2, pluginTester.messages().size());
+
+        assertEquals(DEFAULT_GROUP, pluginTester.message(0).address());
+        assertEquals(DEVELOPER + " Sure, I'll remind you", pluginTester.message(0).body());
+
+        assertEquals(DEFAULT_GROUP, pluginTester.message(1).address());
+        assertEquals(DEVELOPER + " You asked me to remind you to send your message", pluginTester.message(1).body());
+    }
+
+    private void sleep() throws Exception {
+        Thread.sleep(1010);
     }
 }

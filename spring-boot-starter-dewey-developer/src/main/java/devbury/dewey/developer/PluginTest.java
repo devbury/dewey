@@ -16,22 +16,17 @@
 
 package devbury.dewey.developer;
 
-import devbury.dewey.core.server.ChatServer;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Import;
 
-public class Configuration {
+import java.lang.annotation.*;
 
-    @Bean
-    @ConditionalOnMissingBean(CommandLineRunner.class)
-    public Runner runner() {
-        return new Runner();
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@EnableAutoConfiguration
+@Import(TestFrameworkConfiguration.class)
+public @interface PluginTest {
 
-    @Bean
-    @ConditionalOnMissingBean(ChatServer.class)
-    public ConsoleServer consoleServer() {
-        return new ConsoleServer();
-    }
 }

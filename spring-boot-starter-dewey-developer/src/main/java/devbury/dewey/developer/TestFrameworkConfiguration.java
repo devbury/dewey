@@ -16,22 +16,12 @@
 
 package devbury.dewey.developer;
 
-import devbury.dewey.core.server.ChatServer;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-public class Configuration {
+public class TestFrameworkConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(CommandLineRunner.class)
-    public Runner runner() {
-        return new Runner();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ChatServer.class)
-    public ConsoleServer consoleServer() {
-        return new ConsoleServer();
+    public PluginTester pluginTester() {
+        return new PluginTester();
     }
 }
