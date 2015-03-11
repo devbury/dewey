@@ -18,7 +18,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter'
     compile 'org.springframework.boot:spring-boot-starter-aop'
     compile 'org.springframework:spring-context-support'
-    compile 'devbury.threadscope:spring-boot-starter-threadscope:1.0.0'
+    compile 'com.devbury:spring-boot-starter-threadscope:1.1.0'
     compile 'com.google.guava:guava:18.0'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
