@@ -21,19 +21,16 @@ import devbury.dewey.core.model.Address;
 import devbury.dewey.core.model.Group;
 import devbury.dewey.core.model.Message;
 import devbury.dewey.core.server.ChatServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 
-import static devbury.dewey.developer.Addresses.*;
+import static devbury.dewey.developer.Addresses.DEWEY;
+import static devbury.dewey.developer.Addresses.USER;
 
 public class PluginTester implements CommandLineRunner, ChatServer {
-
-    private static final Logger logger = LoggerFactory.getLogger(PluginTester.class);
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -41,7 +38,6 @@ public class PluginTester implements CommandLineRunner, ChatServer {
     private ArrayList<MessageFromDewey> messages = new ArrayList<>();
 
     public void sendMessage(Address address, String message) {
-        logger.debug("Sent {}", message);
         messages.add(new MessageFromDewey(address, message));
     }
 
@@ -50,22 +46,14 @@ public class PluginTester implements CommandLineRunner, ChatServer {
         // Replaces Runner setup through starter
     }
 
-    public void sendMessageToGroup(String groupName, String message) {
-        sendMessageToGroup(new Group(groupName), message);
-    }
-
-    public void sendMessageToGroup(String message) {
-        sendMessageToGroup(DEFAULT_GROUP, message);
-    }
-
     public void sendMessageToGroup(Group group, String message) {
         eventPublisher.publishEvent(new MessageEvent(
-                new Message(group, DEVELOPER, message, DEWEY.getMentionName())));
+                new Message(group, USER, message, DEWEY.getMentionName())));
     }
 
     public void sendMessageToDewey(String message) {
         eventPublisher.publishEvent(new MessageEvent(
-                new Message(null, DEVELOPER, message, DEWEY.getMentionName())));
+                new Message(null, USER, message, DEWEY.getMentionName())));
     }
 
     public void clearMessages() {

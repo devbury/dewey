@@ -31,8 +31,6 @@ public class User extends Address {
 
     @Override
     public String toString() {
-        return "User{" +
-                "mentionName='" + mentionName + '\'' +
-                "} " + super.toString();
+        return getMentionName();
     }
 }

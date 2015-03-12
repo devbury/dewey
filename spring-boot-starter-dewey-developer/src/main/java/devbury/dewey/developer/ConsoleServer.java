@@ -25,7 +25,7 @@ import devbury.dewey.core.server.ChatServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
-import static devbury.dewey.developer.Addresses.DEVELOPER;
+import static devbury.dewey.developer.Addresses.USER;
 import static devbury.dewey.developer.Addresses.DEWEY;
 
 public class ConsoleServer implements ChatServer {
@@ -43,6 +43,6 @@ public class ConsoleServer implements ChatServer {
         if (address.getAddressType() == AddressType.GROUP) {
             group = (Group) address;
         }
-        eventPublisher.publishEvent(new MessageEvent(new Message(group, DEVELOPER, message, DEWEY.getMentionName())));
+        eventPublisher.publishEvent(new MessageEvent(new Message(group, USER, message, DEWEY.getMentionName())));
     }
 }

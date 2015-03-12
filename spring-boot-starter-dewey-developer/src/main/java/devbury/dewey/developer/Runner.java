@@ -71,16 +71,16 @@ public class Runner implements CommandLineRunner {
     private void welcome() {
         System.out.println("\n-== PLUGIN DEVELOPER SERVER ==-\n");
         System.out.println("Users :");
-        System.out.println("  " + DEVELOPER);
+        System.out.println("  " + USER);
         System.out.println("  " + DEWEY);
         System.out.println("\nEx.");
-        System.out.println("  Send a message from developer to dewey");
+        System.out.println("  Send a message from user to dewey");
         System.out.println("    remind me in 10 seconds to attend the meeting");
         System.out.println("Ex.");
-        System.out.println("  Send a message from developer to the default group addressing dewey");
+        System.out.println("  Send a message from user to the default group addressing dewey");
         System.out.println("    g @dewey remind us in 10 seconds to attend the meeting");
         System.out.println("Ex.");
-        System.out.println("  Send a message from developer to a named group addressing dewey");
+        System.out.println("  Send a message from user to a named group addressing dewey");
         System.out.println("    g :group1 @dewey remind us in 10 seconds to attend the meeting");
         System.out.println("\n");
         System.out.println("Enter 'exit' to quit.");

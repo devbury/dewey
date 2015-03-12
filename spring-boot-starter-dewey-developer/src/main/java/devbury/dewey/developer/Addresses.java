@@ -20,27 +20,7 @@ import devbury.dewey.core.model.Group;
 import devbury.dewey.core.model.User;
 
 public class Addresses {
-    public static final User DEWEY = new User("dewey", "@dewey") {
-
-        @Override
-        public String toString() {
-            return getMentionName();
-        }
-    };
-
-    public static final User DEVELOPER = new User("developer", "@developer") {
-
-        @Override
-        public String toString() {
-            return getMentionName();
-        }
-    };
-
-    public static final Group DEFAULT_GROUP = new Group("defaultGroup") {
-
-        @Override
-        public String toString() {
-            return getName();
-        }
-    };
+    public static final User DEWEY = new User("dewey", "@dewey");
+    public static final User USER = new User("user", "@user");
+    public static final Group DEFAULT_GROUP = new Group("defaultGroup");
 }

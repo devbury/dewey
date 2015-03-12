@@ -16,5 +16,5 @@
 
 dependencies {
     compile project(':spring-boot-starter-dewey-core')
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    compile 'org.springframework.boot:spring-boot-starter-test'
 }
