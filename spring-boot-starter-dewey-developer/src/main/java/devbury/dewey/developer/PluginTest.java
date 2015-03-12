@@ -61,7 +61,7 @@ public abstract class PluginTest {
     }
 
     public void assertUserResponseEquals(int messageId, Object value) {
-        assertEquals("Message was not sent to the developer", USER, pt.message(messageId).address());
+        assertEquals("Message was not sent to the user", USER, pt.message(messageId).address());
         assertEquals(value, pt.message(messageId).body());
     }
 
@@ -70,7 +70,7 @@ public abstract class PluginTest {
     }
 
     public void assertGroupResponseEquals(Group group, int messageId, Object value) {
-        assertEquals("message was not sent to the group", group, pt.message(messageId).address());
+        assertEquals("Message was not sent to the group", group, pt.message(messageId).address());
         assertEquals(value, pt.message(messageId).body());
     }
 
