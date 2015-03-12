@@ -53,8 +53,7 @@ public class Runner implements CommandLineRunner {
             if (matcher.matches()) {
                 String groupName = matcher.group(1);
                 String messageBody = matcher.group(2);
-                Group group = new Group(groupName);
-                consoleServer.sendMessageFromUser(group, messageBody);
+                consoleServer.sendMessageFromUser(new Group(groupName), messageBody);
             } else {
                 matcher = withoutGroupName.matcher(message);
                 if (matcher.matches()) {
