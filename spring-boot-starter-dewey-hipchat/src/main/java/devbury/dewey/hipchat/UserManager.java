@@ -27,6 +27,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class UserManager {
@@ -37,10 +39,10 @@ public class UserManager {
     @Autowired
     private Api api;
 
-    private HashMap<String, UserEntry> userEntryById = new HashMap<>();
-    private HashMap<String, UserEntry> userEntryByName = new HashMap<>();
-    private HashMap<String, UserEntry> userEntryByMentionName = new HashMap<>();
-    private HashMap<String, String> xmppJidById = new HashMap<>();
+    private Map<String, UserEntry> userEntryById = new HashMap<>();
+    private Map<String, UserEntry> userEntryByName = new HashMap<>();
+    private Map<String, UserEntry> userEntryByMentionName = new HashMap<>();
+    private final Map<String, String> xmppJidById = new ConcurrentHashMap<>();
 
     @Scheduled(fixedDelay = THIRTY_MINUTES)
     public void configureCaches() {
@@ -72,10 +74,8 @@ public class UserManager {
         return xmppJid;
     }
 
-    protected synchronized void addToXmppJidCache(String id, String xmppJid) {
-        if (xmppJidById.get(id) == null) {
-            xmppJidById.put(id, xmppJid);
-        }
+    protected void addToXmppJidCache(String id, String xmppJid) {
+        xmppJidById.put(id, xmppJid);
     }
 
     public UserEntry findUserEntryById(String id) {
