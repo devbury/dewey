@@ -54,14 +54,14 @@ public class Runner implements CommandLineRunner {
                 String groupName = matcher.group(1);
                 String messageBody = matcher.group(2);
                 Group group = new Group(groupName);
-                consoleServer.sendMessageFromDeveloper(group, messageBody);
+                consoleServer.sendMessageFromUser(group, messageBody);
             } else {
                 matcher = withoutGroupName.matcher(message);
                 if (matcher.matches()) {
                     String messageBody = matcher.group(1);
-                    consoleServer.sendMessageFromDeveloper(DEFAULT_GROUP, messageBody);
+                    consoleServer.sendMessageFromUser(DEFAULT_GROUP, messageBody);
                 } else {
-                    consoleServer.sendMessageFromDeveloper(DEWEY, message);
+                    consoleServer.sendMessageFromUser(DEWEY, message);
                 }
             }
         }

@@ -38,7 +38,7 @@ public class ConsoleServer implements ChatServer {
         System.out.println("[" + address.getAddressType() + " " + address.getName() + "] " + message);
     }
 
-    public void sendMessageFromDeveloper(Address address, String message) {
+    public void sendMessageFromUser(Address address, String message) {
         Group group = null;
         if (address.getAddressType() == AddressType.GROUP) {
             group = (Group) address;
