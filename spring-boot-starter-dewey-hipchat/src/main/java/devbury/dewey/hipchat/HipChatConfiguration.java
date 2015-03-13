@@ -16,8 +16,12 @@
 
 package devbury.dewey.hipchat;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 
+import static devbury.dewey.core.server.DeweySettings.DEWEY_SERVER;
+
+@ConditionalOnProperty(name = DEWEY_SERVER, havingValue = "hipchat")
 @ComponentScan
 public class HipChatConfiguration {
 }

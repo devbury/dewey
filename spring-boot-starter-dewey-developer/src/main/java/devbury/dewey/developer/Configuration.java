@@ -19,8 +19,12 @@ package devbury.dewey.developer;
 import devbury.dewey.core.server.ChatServer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
+import static devbury.dewey.core.server.DeweySettings.DEWEY_SERVER;
+
+@ConditionalOnProperty(value = DEWEY_SERVER, havingValue = "false", matchIfMissing = true)
 public class Configuration {
 
     @Bean

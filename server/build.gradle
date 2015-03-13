@@ -22,17 +22,15 @@ bootRepackage {
 bootRun.enabled = true
 
 dependencies {
-    // Select the desired server
-
     // Plugin developer server with core plugins installed
     compile project(':spring-boot-starter-dewey-developer')
     compile project(':spring-boot-starter-dewey-core-plugins')
 
     // Hipchat server
-    //compile project(':spring-boot-starter-dewey-hipchat')
+    compile project(':spring-boot-starter-dewey-hipchat')
 }
 
-task stage(type:Copy, dependsOn:[clean, build]) {
+task stage(type: Copy, dependsOn: [clean, build]) {
     from jar.archivePath
     into project.rootDir
     rename {
@@ -42,5 +40,5 @@ task stage(type:Copy, dependsOn:[clean, build]) {
 stage.mustRunAfter(clean)
 
 clean << {
-    project.file('dewey.jar').delete()
+    rootProject.file('dewey.jar').delete()
 }

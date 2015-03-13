@@ -43,6 +43,9 @@ public class CoreConfiguration {
     @Autowired(required = false)
     private List<MessageEventListener> messageEventListeners;
 
+    @Autowired
+    private DeweySettings deweySettings;
+
     @Bean
     @ConditionalOnMissingBean(CacheManager.class)
     public GuavaCacheManager guavaCacheManager() {
@@ -51,6 +54,7 @@ public class CoreConfiguration {
 
     @PostConstruct
     public void init() {
+        logger.info("Dewey server: {}", deweySettings.getServer());
         logger.info("Installing plugins:");
         if (messageEventListeners != null) {
             messageEventListeners.forEach(m -> logger.info("  Installed plugin {}", m.getClass().getSimpleName()));
