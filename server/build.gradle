@@ -31,3 +31,16 @@ dependencies {
     // Hipchat server
     //compile project(':spring-boot-starter-dewey-hipchat')
 }
+
+task stage(type:Copy, dependsOn:[clean, build]) {
+    from jar.archivePath
+    into project.rootDir
+    rename {
+        'dewey.jar'
+    }
+}
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('dewey.jar').delete()
+}
