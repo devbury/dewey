@@ -1,0 +1,4 @@
+---
+applications:
+- name: dewey
+  memory: 512M
