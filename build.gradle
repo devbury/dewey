@@ -50,19 +50,6 @@ subprojects {
     }
 }
 
-project(':server') {
-    task banner(type: Copy) {
-        from 'base_banner.txt'
-        into 'src/main/resources'
-        rename 'base_banner.txt', 'banner.txt'
-        expand project: project.name, version: version
-    }
-
-    jar {
-        dependsOn banner
-    }
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
