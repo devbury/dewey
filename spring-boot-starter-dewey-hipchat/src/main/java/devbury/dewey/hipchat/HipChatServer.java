@@ -43,7 +43,7 @@ public class HipChatServer implements ChatServer {
 
     public static final long ROOM_REFRESH_INTERVAL = 1000 * 60 * 2;
 
-    private static final String GROUP_SERVICE_NAME = "conf.hipchat.com";
+    static final String GROUP_SERVICE_NAME = "conf.hipchat.com";
 
     private static final Logger logger = LoggerFactory.getLogger(HipChatServer.class);
 
@@ -56,7 +56,7 @@ public class HipChatServer implements ChatServer {
     @Autowired
     private List<FilteredPacketListener> filteredPacketListeners;
 
-    private Map<String, MultiUserChat> joinedRooms = new HashMap<>();
+    private Map<String, MultiUserChat> joinedRoomsByName = new HashMap<>();
 
     private XMPPConnection xmppConnection;
 
@@ -105,13 +105,17 @@ public class HipChatServer implements ChatServer {
     protected void joinRooms() throws Exception {
         logger.debug("looking for rooms to join");
         for (HostedRoom hostedRoom : MultiUserChat.getHostedRooms(xmppConnection, GROUP_SERVICE_NAME)) {
-            if (!joinedRooms.containsKey(hostedRoom.getName())) {
-                MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
-                if (!room.isJoined()) {
-                    logger.debug("joining room {}", hostedRoom.getName());
-                    room.join(hipChatSettings.getName());
+            if (!joinedRoomsByName.containsKey(hostedRoom.getName())) {
+                // check our list of allowed rooms
+                if (hipChatSettings.getGroupsToJoin().isEmpty() || hipChatSettings.getGroupsToJoin().contains
+                        (hostedRoom.getName())) {
+                    MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
+                    if (!room.isJoined()) {
+                        logger.debug("joining room {}", hostedRoom.getName());
+                        room.join(hipChatSettings.getName());
+                    }
+                    joinedRoomsByName.put(hostedRoom.getName(), room);
                 }
-                joinedRooms.put(hostedRoom.getName(), room);
             }
         }
     }
@@ -121,7 +125,7 @@ public class HipChatServer implements ChatServer {
         if (address.getAddressType() == AddressType.GROUP) {
             Group group = (Group) address;
             logger.debug("sending message to room {}", group.getName());
-            MultiUserChat room = joinedRooms.get(group.getName());
+            MultiUserChat room = joinedRoomsByName.get(group.getName());
             try {
                 room.sendMessage(message);
             } catch (Exception e) {
@@ -143,11 +147,15 @@ public class HipChatServer implements ChatServer {
         this.xmppConnection = xmppConnection;
     }
 
-    void setJoinedRooms(Map<String, MultiUserChat> joinedRooms) {
-        this.joinedRooms = joinedRooms;
+    void setJoinedRoomsByName(Map<String, MultiUserChat> joinedRoomsByName) {
+        this.joinedRoomsByName = joinedRoomsByName;
     }
 
     void setUserManager(UserManager userManager) {
         this.userManager = userManager;
+    }
+
+    void setHipChatSettings(HipChatSettings hipChatSettings) {
+        this.hipChatSettings = hipChatSettings;
     }
 }

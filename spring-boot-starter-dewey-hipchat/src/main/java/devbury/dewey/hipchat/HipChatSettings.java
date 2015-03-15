@@ -20,6 +20,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @ConfigurationProperties(prefix = "hipchat")
@@ -40,6 +44,7 @@ public class HipChatSettings {
     private String resource = "DeweyServer";
     private String server = "chat.hipchat.com";
     private int port = 5222;
+    private List<String> groupsToJoin = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -124,5 +129,16 @@ public class HipChatSettings {
 
     public void setXmppJid(String xmppJid) {
         this.xmppJid = xmppJid;
+    }
+
+    public List<String> getGroupsToJoin() {
+        return groupsToJoin;
+    }
+
+    public void setGroupsToJoin(String groupsToJoin) {
+        this.groupsToJoin = Arrays.asList(groupsToJoin.split(","))
+                .stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 }

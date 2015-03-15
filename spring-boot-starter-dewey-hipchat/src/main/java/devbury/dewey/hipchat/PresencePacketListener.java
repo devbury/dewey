@@ -16,20 +16,10 @@
 
 package devbury.dewey.hipchat;
 
-import devbury.dewey.core.model.Status;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 
 public class PresencePacketListener extends FilteredPacketListener<Presence> {
-
-    private static final Logger logger = LoggerFactory.getLogger(PresencePacketListener.class);
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
 
     @Override
     public PacketTypeFilter getPacketTypeFilter() {
@@ -38,6 +28,5 @@ public class PresencePacketListener extends FilteredPacketListener<Presence> {
 
     @Override
     public void handlePacket(Presence packet) {
-        Status status = new Status();
     }
 }
