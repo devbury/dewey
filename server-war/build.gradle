@@ -21,7 +21,16 @@ configurations {
 }
 
 dependencies {
+    // Core plugins
+    compile project(':spring-boot-starter-dewey-core-plugins')
+
+    // User plugins
+    compile project(':user-plugins')
+
+    // Hipchat server
     compile project(':spring-boot-starter-dewey-hipchat')
+
+    // Remove embedded tomcat
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 

@@ -22,13 +22,19 @@ bootRepackage {
 bootRun.enabled = true
 
 dependencies {
-    // Plugin developer server with core plugins installed
-    compile project(':spring-boot-starter-dewey-developer')
+    // Core plugins
     compile project(':spring-boot-starter-dewey-core-plugins')
+
+    // User plugins
+    compile project(':user-plugins')
 
     // Hipchat server
     compile project(':spring-boot-starter-dewey-hipchat')
+
+    // Plugin Developer server
+    compile project(':spring-boot-starter-dewey-developer')
 }
+
 
 task stage(type: Copy, dependsOn: [clean, build]) {
     from jar.archivePath

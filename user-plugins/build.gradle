@@ -18,6 +18,3 @@ dependencies {
     compile project(':spring-boot-starter-dewey-core')
     testCompile project(':spring-boot-starter-dewey-developer')
 }
-
-
-

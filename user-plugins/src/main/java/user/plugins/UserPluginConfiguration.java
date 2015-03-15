@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-dependencies {
-    compile project(':spring-boot-starter-dewey-core')
-    testCompile project(':spring-boot-starter-dewey-developer')
+package user.plugins;
+
+import org.springframework.context.annotation.ComponentScan;
+
+/**
+ * Place custom plugins under the "user.plugins" package or specify a custom package to component scan.
+ */
+@ComponentScan
+public class UserPluginConfiguration {
 }
-
-
-
