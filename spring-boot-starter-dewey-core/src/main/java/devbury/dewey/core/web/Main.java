@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-dependencies {
-    compile 'org.springframework.boot:spring-boot-starter'
-    compile 'org.springframework.boot:spring-boot-starter-aop'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-velocity'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
-    compile 'org.springframework:spring-context-support'
-    compile 'com.devbury:spring-boot-starter-threadscope:1.1.0'
-    compile 'com.google.guava:guava:18.0'
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
+package devbury.dewey.core.web;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.time.LocalTime;
+
+@Controller
+public class Main {
+
+    @RequestMapping("/")
+    public String index(Model model) {
+        model.addAttribute("time", LocalTime.now());
+        return "core/index";
+    }
 }

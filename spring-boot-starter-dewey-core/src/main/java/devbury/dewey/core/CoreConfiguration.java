@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package devbury.dewey.core.server;
+package devbury.dewey.core;
 
 import devbury.dewey.core.event.MessageEventListener;
+import devbury.dewey.core.server.DeweySettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

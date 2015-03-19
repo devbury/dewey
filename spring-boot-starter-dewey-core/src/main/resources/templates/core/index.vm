@@ -1,0 +1,10 @@
+<html>
+<head>
+    <title>dewey</title>
+</head>
+
+<body>
+<h1>Hi, I'm Dewey.</h1>
+<p>The current time is $time</p>
+</body>
+</html>

@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=devbury.dewey.core.server.CoreConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=devbury.dewey.core.CoreConfiguration
