@@ -20,14 +20,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalTime;
+import javax.annotation.PostConstruct;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Controller
 public class Main {
 
+    private Instant startTime;
+
     @RequestMapping("/")
     public String index(Model model) {
-        model.addAttribute("time", LocalTime.now());
+        model.addAttribute("minutes", ChronoUnit.MINUTES.between(startTime, Instant.now()));
         return "core/index";
+    }
+
+    @PostConstruct
+    public void init() {
+        startTime = Instant.now();
     }
 }

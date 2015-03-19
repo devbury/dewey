@@ -5,6 +5,6 @@
 
 <body>
 <h1>Hi, I'm Dewey.</h1>
-<p>The current time is $time</p>
+<p>I have been running for $minutes minutes.</p>
 </body>
 </html>
