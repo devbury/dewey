@@ -23,6 +23,8 @@ import devbury.dewey.core.model.Message;
 import devbury.dewey.core.model.User;
 import devbury.dewey.core.server.ChatServer;
 import devbury.dewey.core.server.Plugin;
+import devbury.dewey.plugins.help.Usage;
+import devbury.dewey.plugins.help.UsageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Plugin
-public class RemindMe implements MessageEventListener {
+public class RemindMe implements MessageEventListener, Usage {
 
     private static final Logger logger = LoggerFactory.getLogger(RemindMe.class);
 
@@ -86,6 +88,17 @@ public class RemindMe implements MessageEventListener {
         }
 
         logger.debug("did not process message {}", message.getBody());
+    }
+
+    @Override
+    public UsageSummary usageSummary() {
+        return new UsageSummary("Remind the user to do something in the future")
+                .addCommand("remind");
+    }
+
+    @Override
+    public String usageDetails(String command, String args) {
+        return "remind (me|us) in X (second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months) to Y";
     }
 
     protected void scheduleMessage(Address replyTo, String message, Date notifyAt) {
