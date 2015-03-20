@@ -17,7 +17,14 @@
 package devbury.dewey.core.server;
 
 import devbury.dewey.core.model.Address;
+import devbury.dewey.core.model.Message;
 
 public interface ChatServer {
     void sendMessage(Address address, String message);
+
+    default void respondToMessage(Message message, String response) {
+        String mention = message.isToGroup() ? message.getFrom().getMentionName() + " " : "";
+        Address replyTo = message.isToGroup() ? message.getGroup() : message.getFrom();
+        sendMessage(replyTo, mention + response);
+    }
 }
