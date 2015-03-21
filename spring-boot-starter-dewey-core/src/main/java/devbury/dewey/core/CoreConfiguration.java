@@ -56,7 +56,7 @@ public class CoreConfiguration {
     @PostConstruct
     public void init() {
         logger.info("Dewey server: {}", deweySettings.getServer());
-        logger.info("Installing plugins:");
+        logger.info("Installed plugins:");
         if (messageEventListeners != null) {
             messageEventListeners.forEach(m -> logger.info("  Installed plugin {}", m.getClass().getSimpleName()));
         } else {
