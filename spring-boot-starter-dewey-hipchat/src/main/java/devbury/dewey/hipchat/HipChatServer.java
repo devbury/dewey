@@ -105,16 +105,17 @@ public class HipChatServer implements ChatServer {
     protected void joinRooms() throws Exception {
         logger.debug("looking for rooms to join");
         for (HostedRoom hostedRoom : MultiUserChat.getHostedRooms(xmppConnection, GROUP_SERVICE_NAME)) {
-            if (!joinedRoomsByName.containsKey(hostedRoom.getName())) {
+            String roomName = convertGroupName(hostedRoom.getName());
+            if (!joinedRoomsByName.containsKey(roomName)) {
                 // check our list of allowed rooms
                 if (hipChatSettings.getGroupsToJoin().isEmpty() || hipChatSettings.getGroupsToJoin().contains
                         (hostedRoom.getName())) {
                     MultiUserChat room = new MultiUserChat(xmppConnection, hostedRoom.getJid());
                     if (!room.isJoined()) {
-                        logger.debug("joining room {}", hostedRoom.getName());
+                        logger.debug("joining room {}", roomName);
                         room.join(hipChatSettings.getName());
                     }
-                    joinedRoomsByName.put(hostedRoom.getName(), room);
+                    joinedRoomsByName.put(roomName, room);
                 }
             }
         }
@@ -141,6 +142,10 @@ public class HipChatServer implements ChatServer {
                 logger.warn("Could not send message to user {}, {}", xmppJid, e);
             }
         }
+    }
+
+    protected String convertGroupName(String name) {
+        return name.replaceAll("\"", "").replaceAll(" ", "_").toLowerCase();
     }
 
     void setXmppConnection(XMPPConnection xmppConnection) {

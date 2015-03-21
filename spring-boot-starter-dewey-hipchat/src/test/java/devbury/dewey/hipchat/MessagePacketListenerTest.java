@@ -17,39 +17,36 @@
 package devbury.dewey.hipchat;
 
 import devbury.dewey.core.event.MessageEvent;
-import devbury.dewey.core.model.Group;
-import devbury.dewey.core.model.User;
 import devbury.dewey.hipchat.api.model.UserEntry;
-import mockit.*;
+import mockit.Mocked;
+import mockit.NonStrictExpectations;
+import mockit.Verifications;
 import mockit.integration.junit4.JMockit;
 import org.jivesoftware.smack.packet.Message;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-@Ignore
 @RunWith(JMockit.class)
 public class MessagePacketListenerTest {
 
-    @Tested
-    MessagePacketListener messagePacketListener;
+    MessagePacketListener victim;
 
     @Mocked
     LoggerFactory loggerFactory;
 
-    @Injectable
-    ApplicationEventPublisher applicationEventPublisher;
+    @Before
+    public void before() {
+        victim = new MessagePacketListener();
+    }
 
     @Test
     public void getPacketTypeFilter() {
-        assertTrue(messagePacketListener.getPacketTypeFilter().accept(new Message()));
+        assertTrue(victim.getPacketTypeFilter().accept(new Message()));
     }
 
     @Test
@@ -63,7 +60,7 @@ public class MessagePacketListenerTest {
         };
         message.setBody(null);
 
-        messagePacketListener.handlePacket(message);
+        victim.handlePacket(message);
     }
 
     @Test
@@ -73,7 +70,7 @@ public class MessagePacketListenerTest {
         message.setBody("some message");
         message.setType(Message.Type.chat);
 
-        messagePacketListener.handlePacket(message);
+        victim.handlePacket(message);
 
         // verify that an error message was logged
         new Verifications() {
@@ -84,7 +81,7 @@ public class MessagePacketListenerTest {
     }
 
     @Test
-    public void handlePacketChat(@Mocked UserManager userManager) {
+    public void handlePacketChat(@Mocked UserManager userManager, @Mocked ApplicationEventPublisher eventPublisher) {
         UserEntry userEntry = new UserEntry();
         userEntry.setName("name");
         userEntry.setMentionName("mention_name");
@@ -96,37 +93,30 @@ public class MessagePacketListenerTest {
             }
         };
 
-        messagePacketListener.setUserManager(userManager);
-
-        final ArrayList<String> called = new ArrayList<>();
-
-        ApplicationEventPublisher applicationEventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(ApplicationEvent event) {
-                called.add("publishEvent called");
-                MessageEvent messageEvent = (MessageEvent) event;
-                devbury.dewey.core.model.Message message = messageEvent.getMessage();
-                assertTrue(message.isToMe());
-                User user = message.getFrom();
-                assertEquals("name", user.getName());
-                assertEquals("body", message.getBody());
-            }
-        };
-
-        messagePacketListener.setEventPublisher(applicationEventPublisher);
+        victim.setUserManager(userManager);
+        victim.setEventPublisher(eventPublisher);
 
         HipChatSettings hipChatSettings = new HipChatSettings();
         hipChatSettings.setMentionName("my_mention_name");
 
-        messagePacketListener.setHipChatSettings(hipChatSettings);
+        victim.setHipChatSettings(hipChatSettings);
 
         Message message = new Message();
         message.setFrom("group_900@chat.hipchat.com/morestuff");
         message.setBody("body");
         message.setType(Message.Type.chat);
 
-        messagePacketListener.handlePacket(message);
-        assertEquals(1, called.size());
+        victim.handlePacket(message);
+
+        new Verifications() {
+            {
+                MessageEvent e;
+                eventPublisher.publishEvent(e = withCapture());
+                assertTrue(e.getMessage().isToMe());
+                assertEquals("name", e.getMessage().getFrom().getName());
+                assertEquals("body", e.getMessage().getBody());
+            }
+        };
     }
 
     @Test
@@ -136,7 +126,7 @@ public class MessagePacketListenerTest {
         message.setBody("some message");
         message.setType(Message.Type.groupchat);
 
-        messagePacketListener.handlePacket(message);
+        victim.handlePacket(message);
 
         // verify that an error message was logged
         new Verifications() {
@@ -147,7 +137,7 @@ public class MessagePacketListenerTest {
     }
 
     @Test
-    public void handlePacketGroupChat(@Mocked UserManager userManager) {
+    public void handlePacketGroupChat(@Mocked UserManager userManager, @Mocked ApplicationEventPublisher eventPublisher) {
         UserEntry userEntry = new UserEntry();
         userEntry.setName("Some User");
         userEntry.setMentionName("mention_name");
@@ -159,39 +149,31 @@ public class MessagePacketListenerTest {
             }
         };
 
-        messagePacketListener.setUserManager(userManager);
-
-        final ArrayList<String> called = new ArrayList<>();
-
-        ApplicationEventPublisher applicationEventPublisher = new ApplicationEventPublisher() {
-            @Override
-            public void publishEvent(ApplicationEvent event) {
-                called.add("publishEvent called");
-                MessageEvent messageEvent = (MessageEvent) event;
-                devbury.dewey.core.model.Message message = messageEvent.getMessage();
-                assertTrue(message.isToGroup());
-                Group group = message.getGroup();
-                assertEquals("group", group.getName());
-                User user = message.getFrom();
-                assertEquals("Some User", user.getName());
-                assertEquals("@my_mention_name body", message.getBody());
-                assertTrue(message.isDirectedToMe());
-            }
-        };
-
-        messagePacketListener.setEventPublisher(applicationEventPublisher);
+        victim.setUserManager(userManager);
+        victim.setEventPublisher(eventPublisher);
 
         HipChatSettings hipChatSettings = new HipChatSettings();
         hipChatSettings.setMentionName("my_mention_name");
 
-        messagePacketListener.setHipChatSettings(hipChatSettings);
+        victim.setHipChatSettings(hipChatSettings);
 
         Message message = new Message();
-        message.setFrom("somestring_group@hipchat.com/Some User");
+        message.setFrom("somestring_group_name@hipchat.com/Some User");
         message.setBody("@my_mention_name body");
         message.setType(Message.Type.groupchat);
 
-        messagePacketListener.handlePacket(message);
-        assertEquals(1, called.size());
+        victim.handlePacket(message);
+
+        new Verifications() {
+            {
+                MessageEvent e;
+                eventPublisher.publishEvent(e = withCapture());
+                assertTrue(e.getMessage().isToGroup());
+                assertEquals("group_name", e.getMessage().getGroup().getName());
+                assertEquals("Some User", e.getMessage().getFrom().getName());
+                assertEquals("@my_mention_name body", e.getMessage().getBody());
+                assertTrue(e.getMessage().isDirectedToMe());
+            }
+        };
     }
 }

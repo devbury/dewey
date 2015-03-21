@@ -147,5 +147,13 @@ public class HipChatServerTest {
         assertEquals(0, joinedRoomsByName.size());
     }
 
+    @Test
+    public void testConverGroupName() {
+        HipChatServer victim = new HipChatServer();
 
+        assertEquals("group", victim.convertGroupName("group"));
+        assertEquals("group", victim.convertGroupName("Group"));
+        assertEquals("group_two", victim.convertGroupName("group two"));
+        assertEquals("group_two", victim.convertGroupName("group \"two\""));
+    }
 }

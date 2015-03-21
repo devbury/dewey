@@ -34,7 +34,7 @@ public class MessagePacketListener extends FilteredPacketListener<Message> {
 
     private final Pattern chatFrom = Pattern.compile("^.*_([0-9]*).*$");
 
-    private final Pattern groupFrom = Pattern.compile("^.*_(.*)@.*/(.*)$");
+    private final Pattern groupFrom = Pattern.compile("^[^_]*_(.*)@.*/(.*)$");
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
