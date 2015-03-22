@@ -45,9 +45,6 @@ public class CoreConfiguration {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private DeweySettings deweySettings;
-
     @Bean
     @ConditionalOnMissingBean(CacheManager.class)
     public GuavaCacheManager guavaCacheManager() {
@@ -56,7 +53,6 @@ public class CoreConfiguration {
 
     @PostConstruct
     public void init() {
-        logger.info("Dewey server: {}", deweySettings.getServer());
         logger.info("Installed plugins:");
         Stream.of(applicationContext.getBeanNamesForAnnotation(Plugin.class))
                 .sorted()
