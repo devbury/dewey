@@ -16,12 +16,12 @@
 
 package devbury.dewey.plugins.keepalive;
 
-public class Response {
-    private String healthUrl;
+public class HealthCheck {
+    private String healthCheckUrl;
     private String message;
 
-    public void sethealthUrl(String healthUrl) {
-        this.healthUrl = healthUrl;
+    public void sethealthCheckUrl(String healthCheckUrl) {
+        this.healthCheckUrl = healthCheckUrl;
     }
 
     public void setMessage(String message) {
@@ -30,6 +30,6 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Server responded with message: " + message + ", healthUrl: " + healthUrl;
+        return "Server responded with message: " + message + ", healthCheckUrl: " + healthCheckUrl;
     }
 }

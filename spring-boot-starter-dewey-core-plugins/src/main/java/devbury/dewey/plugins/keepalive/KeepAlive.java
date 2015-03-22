@@ -35,7 +35,7 @@ import org.springframework.web.client.RestTemplate;
 public class KeepAlive {
 
     private static final long TWENTY_MINUTES = 20 * 60 * 1000;
-    private static final String KEEP_ALIVE_URL = "http://keep.dewey.alive.devbury.com/health-check-now";
+    private static final String KEEP_ALIVE_URL = "http://keep.dewey.alive.devbury.com/health-check";
 
     private static final Logger logger = LoggerFactory.getLogger(KeepAlive.class);
 
@@ -47,7 +47,7 @@ public class KeepAlive {
     @Scheduled(fixedDelay = TWENTY_MINUTES, initialDelay = TWENTY_MINUTES)
     public void ping() {
         try {
-            logger.info("{}", restTemplate.postForObject(KEEP_ALIVE_URL, deweySettings.getUrl(), Response.class));
+            logger.info("{}", restTemplate.postForObject(KEEP_ALIVE_URL, deweySettings.getUrl(), HealthCheck.class));
         } catch (Exception e) {
             logger.warn("Could not reach keep alive server.  {}", e.toString());
         }
