@@ -16,8 +16,8 @@
 
 package devbury.dewey.core;
 
-import devbury.dewey.core.event.MessageEventListener;
 import devbury.dewey.core.server.DeweySettings;
+import devbury.dewey.core.server.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +25,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.guava.GuavaCacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.stream.Stream;
 
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableCaching
@@ -41,8 +42,8 @@ public class CoreConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(CoreConfiguration.class);
 
-    @Autowired(required = false)
-    private List<MessageEventListener> messageEventListeners;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private DeweySettings deweySettings;
@@ -57,10 +58,8 @@ public class CoreConfiguration {
     public void init() {
         logger.info("Dewey server: {}", deweySettings.getServer());
         logger.info("Installed plugins:");
-        if (messageEventListeners != null) {
-            messageEventListeners.forEach(m -> logger.info("  Installed plugin {}", m.getClass().getSimpleName()));
-        } else {
-            logger.info("  NONE!");
-        }
+        Stream.of(applicationContext.getBeanNamesForAnnotation(Plugin.class))
+                .sorted()
+                .forEach(m -> logger.info("  {}", m));
     }
 }
