@@ -16,10 +16,13 @@
 
 package devbury.dewey.hipchat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,15 +32,11 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "hipchat")
 public class HipChatSettings {
 
-    @NotNull
+    private static final Logger logger = LoggerFactory.getLogger(HipChatSettings.class);
+
     private String email;
-
-    @NotNull
     private String password;
-
-    @NotNull
     private String apiToken;
-
     private String xmppJid;
     private String name;
     private String mentionName;
@@ -45,6 +44,17 @@ public class HipChatSettings {
     private String server = "chat.hipchat.com";
     private int port = 5222;
     private List<String> groupsToJoin = new ArrayList<>();
+
+    @PostConstruct
+    public void checkProperties() {
+        Assert.hasText(email, "hipchat.email is not set!");
+        Assert.hasText(password, "hipchat.password is not set!");
+        Assert.hasText(apiToken, "hipchat.apiToken is not set!");
+        if (!groupsToJoin.isEmpty()) {
+            logger.info("{}", groupsToJoin.stream()
+                    .collect(Collectors.joining(", ", "Only joining groups: ", "")));
+        }
+    }
 
     @Override
     public String toString() {
