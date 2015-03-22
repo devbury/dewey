@@ -17,11 +17,11 @@
 package devbury.dewey.plugins.keepalive;
 
 public class Response {
-    private String pingUrl;
+    private String healthUrl;
     private String message;
 
-    public void setPingUrl(String pingUrl) {
-        this.pingUrl = pingUrl;
+    public void sethealthUrl(String healthUrl) {
+        this.healthUrl = healthUrl;
     }
 
     public void setMessage(String message) {
@@ -30,6 +30,6 @@ public class Response {
 
     @Override
     public String toString() {
-        return "Server responded with message: " + message + ", pingUrl: " + pingUrl;
+        return "Server responded with message: " + message + ", healthUrl: " + healthUrl;
     }
 }
