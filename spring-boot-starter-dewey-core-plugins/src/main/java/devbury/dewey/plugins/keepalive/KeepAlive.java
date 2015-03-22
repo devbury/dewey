@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package devbury.dewey.plugins;
+package devbury.dewey.plugins.keepalive;
 
 import devbury.dewey.core.server.Plugin;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class KeepAlive {
     @Scheduled(fixedDelay = TWENTY_MINUTES, initialDelay = TWENTY_MINUTES)
     public void ping() {
         try {
-            restTemplate.getForObject(KEEP_ALIVE_URL, String.class);
+            logger.debug("{}", restTemplate.getForObject(KEEP_ALIVE_URL, Response.class));
         } catch (Exception e) {
             logger.warn("Could not reach keep alive server.  {}", e.toString());
         }
