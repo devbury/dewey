@@ -16,9 +16,11 @@
 
 package devbury.dewey.plugins.keepalive;
 
+import devbury.dewey.core.server.DeweySettings;
 import devbury.dewey.core.server.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestTemplate;
@@ -37,12 +39,15 @@ public class KeepAlive {
 
     private static final Logger logger = LoggerFactory.getLogger(KeepAlive.class);
 
+    @Autowired
+    private DeweySettings deweySettings;
+
     private RestTemplate restTemplate = new RestTemplate();
 
     @Scheduled(fixedDelay = TWENTY_MINUTES, initialDelay = TWENTY_MINUTES)
     public void ping() {
         try {
-            logger.debug("{}", restTemplate.getForObject(KEEP_ALIVE_URL, Response.class));
+            logger.info("{}", restTemplate.postForObject(KEEP_ALIVE_URL, deweySettings.getUrl(), Response.class));
         } catch (Exception e) {
             logger.warn("Could not reach keep alive server.  {}", e.toString());
         }
