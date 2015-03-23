@@ -20,6 +20,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-velocity'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework:spring-context-support'
     compile 'com.devbury:spring-boot-starter-threadscope:1.1.0'
     compile 'com.google.guava:guava:18.0'
