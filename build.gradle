@@ -19,14 +19,19 @@ buildscript {
         springBootVersion = '1.2.2.RELEASE'
     }
     repositories {
+        maven {
+            url 'http://repo.spring.io/plugins-release'
+        }
         jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
     }
 }
 subprojects {
     apply plugin: 'spring-boot'
+    apply plugin: 'propdeps'
 
     bootRepackage {
         enabled = false
@@ -46,8 +51,11 @@ subprojects {
     targetCompatibility = 1.8
 
     dependencies {
+        optional "org.springframework.boot:spring-boot-configuration-processor"
         testCompile 'org.jmockit:jmockit:1.15'
     }
+
+    compileJava.dependsOn(processResources)
 }
 
 task wrapper(type: Wrapper) {
