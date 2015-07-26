@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static devbury.dewey.developer.Addresses.DEFAULT_GROUP;
@@ -30,17 +30,13 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableAutoConfiguration
+@Import(TestFrameworkConfiguration.class)
 public abstract class PluginTest {
 
     private int messageIndex = 0;
 
     @Autowired
     private PluginTester pt;
-
-    @Bean
-    public PluginTester pluginTester() {
-        return new PluginTester();
-    }
 
     @Before
     public void init() {
